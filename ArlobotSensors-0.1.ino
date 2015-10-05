@@ -23,9 +23,9 @@
 //pins 0 and 1 should be reserved for serial communication, do not use for sensors
 const int startPingPin = 2;
 //number of ping sensors
-const int numPing = 1;
+const int numPing = 4;
 //starting IR sensor pin (these will be labeled analog IN on the arduino, default SHOULD be A0) 
-const int numIr = 1;
+const int numIr = 4;
 
 char request;
 
@@ -43,6 +43,7 @@ void loop() {
   }
   if(request == 'i'){
     pollSensors(); // poll the sensors for data and print to serial
+    request = 's';
   }
 }
 
