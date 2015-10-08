@@ -43,7 +43,7 @@ String retVal;
 
 void setup() {
   // initialize serial communication:
-  Serial.begin(115200);
+  Serial.begin(57600);
   //retVal = retValFormat1;
 }
 
@@ -104,15 +104,9 @@ void pollSensors(){
 
     // convert the time into a distance
     pcm = microsecondsToCentimeters(duration);
-    //retBuf += i+","+pcm+".";
     if(debug == 1)
       start = micros();
     retVal = retValFormat1+i+retValFormat2+pcm+retValFormat3;
-    //Serial.print("p,");
-    //Serial.print(i);
-    //Serial.print(",");
-    //Serial.print(pcm);
-    //Serial.print(".");
     Serial.print(retVal);
     if(debug == 1){
       finish = micros();
@@ -122,16 +116,10 @@ void pollSensors(){
     }
     //if there is a matching IR sensor return it's reading as well
     if(i < numIr ){
-        Serial.print("i,");
-        Serial.print(i);
-        Serial.print(",");
-        Serial.print(irSenseCm(i));
-        Serial.print(".");
+        retVal = retValFormat1+i+retValFormat2+irSenseCm(i)+retValFormat3;
+        Serial.print(retVal);
       }
-    //delay(100);
-    
   }
-  //delay(100);
 }
 
 //function to return ir sensor data in cm
@@ -145,21 +133,4 @@ float irSenseCm(int readPort){
   distanceCm = 27.86 * pow(readVolts, -1.15);
   return distanceCm;
 }
-
-//there has to be a better way to cycle over all of the analog ports
-//this is currently only tested with the uno which has 5 analog ports
-//if you have more, add more case statements
-
-
-
-/*
-void pinInit(int readPin){
-    pinMode(readPin, OUTPUT);
-    digitalWrite(readPin, LOW);
-    delayMicroseconds(2);
-    digitalWrite(readPin, HIGH);
-    delayMicroseconds(5);
-    digitalWrite(readPin, LOW);
-}
-*/
 

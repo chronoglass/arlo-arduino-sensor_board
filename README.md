@@ -6,6 +6,7 @@ Arduino sketch trying to replicate
 https://github.com/chrisl8/ArloBot/tree/master/Propeller%20C%20Code%20for%20ArloBot
 
 Serial communication apears to be working
+have bumped communication down between the duino and propeller board to 57600
 
 Serial connections:
 (if you havn't changed the transmission settings from per_robot file in .arlobot)
