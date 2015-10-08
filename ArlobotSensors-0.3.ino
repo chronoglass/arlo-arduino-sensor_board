@@ -1,5 +1,5 @@
-/* ArloBot arduino PING))) sensor array
- * 
+/* ArloBot arduino sensor array
+ *  Version 0.3
  *  Code to read an array of sensors and return serial data to main Arlobot board
  *  running Chrisl8's arlobot ROS code
  *  https://github.com/chrisl8/ArloBot
@@ -25,35 +25,37 @@ const int startPingPin = 2;
 //number of ping sensors
 const int numPing = 4;
 //starting IR sensor pin (these will be labeled analog IN on the arduino, default SHOULD be A0) 
-const int numIr = 4;
+const int numIr = 0;
 
+/*debug vars
+ * enable debug info to serial
+ * this will mess up ROS, so do not use in "production"
+ * 0 = normal, 1 = debug mode
+ */
+int debug = 0;
+long start, finish;
 char request;
+
+String retValFormat1 = "p,";
+String retValFormat2 = ",";
+String retValFormat3 = ".";
+String retVal;
 
 void setup() {
   // initialize serial communication:
   Serial.begin(115200);
-  // reserve a byte for the input:
-  //inputString.reserve(1);
+  //retVal = retValFormat1;
 }
 
 void loop() {
   if(Serial.available() > 0){
-    //request = "";
+    //request = '';
     request = (char)Serial.read();
   }
   if(request == 'i'){
     pollSensors(); // poll the sensors for data and print to serial
     request = 's';
   }
-}
-
-long microsecondsToInches(long microseconds) {
-  // According to Parallax's datasheet for the PING))), there are
-  // 73.746 microseconds per inch (i.e. sound travels at 1130 feet per
-  // second).  This gives the distance travelled by the ping, outbound
-  // and return, so we divide by 2 to get the distance of the obstacle.
-  // See: http://www.parallax.com/dl/docs/prod/acc/28015-PING-v1.3.pdf
-  return microseconds / 74 / 2;
 }
 
 long microsecondsToCentimeters(long microseconds) {
@@ -73,41 +75,63 @@ void pollSensors(){
   // init each of the pings in order
   
   for(int i=0; i < numPing; i++){
+    // debug timing code
+    if(debug == 1)
+      start = micros();
     int pingPin = startPingPin + i;
+    //pinInit(pingPin);
     pinMode(pingPin, OUTPUT);
     digitalWrite(pingPin, LOW);
+    //PORTD &= ~_BV('PD'+pingPin);
     delayMicroseconds(2);
     digitalWrite(pingPin, HIGH);
+    //PORTD |= _BV('PD'+pingPin);
     delayMicroseconds(5);
     digitalWrite(pingPin, LOW);
-  
+    //PORTD &= ~_BV('PD'+pingPin);
+    if(debug == 1){
+      finish = micros();
+      long time1 = finish - start;
+      Serial.println(time1);
+    }
   // The same pin is used to read the signal from the PING))): a HIGH
   // pulse whose duration is the time (in microseconds) from the sending
   // of the ping to the reception of its echo off of an object.
   // this will cycle through each of them and print the output to serial
-  
+
     pinMode(pingPin, INPUT);
     duration = pulseIn(pingPin, HIGH);
 
     // convert the time into a distance
     pcm = microsecondsToCentimeters(duration);
-
-    Serial.print("p,");
-    Serial.print(i);
-    Serial.print(",");
-    Serial.print(pcm);
-    Serial.println(".");
+    //retBuf += i+","+pcm+".";
+    if(debug == 1)
+      start = micros();
+    retVal = retValFormat1+i+retValFormat2+pcm+retValFormat3;
+    //Serial.print("p,");
+    //Serial.print(i);
+    //Serial.print(",");
+    //Serial.print(pcm);
+    //Serial.print(".");
+    Serial.print(retVal);
+    if(debug == 1){
+      finish = micros();
+      Serial.println(" ");
+      long time1 = finish - start;
+      Serial.println(time1);
+    }
     //if there is a matching IR sensor return it's reading as well
     if(i < numIr ){
         Serial.print("i,");
         Serial.print(i);
         Serial.print(",");
         Serial.print(irSenseCm(i));
-        Serial.println(".");
+        Serial.print(".");
       }
-    delay(100);
+    //delay(100);
     
   }
+  //delay(100);
 }
 
 //function to return ir sensor data in cm
@@ -116,7 +140,7 @@ float readVolts;
 float distanceCm;
 
 float irSenseCm(int readPort){
-  reading = analogRead(retAnalogPort(readPort));  // Read the sensor
+  reading = analogRead('A'+readPort);  // Read the sensor
   readVolts = reading * 5.0 / 4096.0;
   distanceCm = 27.86 * pow(readVolts, -1.15);
   return distanceCm;
@@ -126,22 +150,16 @@ float irSenseCm(int readPort){
 //this is currently only tested with the uno which has 5 analog ports
 //if you have more, add more case statements
 
-int retAnalogPort(int input){
-  switch(input){
-    case 0:
-      return A0;
-    case 1:
-      return A1;
-    case 2:
-      return A2;
-    case 3:
-      return A3;
-    case 4:
-      return A4;
-    case 5:
-      return A5;
-    default:
-    break;
-  }
+
+
+/*
+void pinInit(int readPin){
+    pinMode(readPin, OUTPUT);
+    digitalWrite(readPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(readPin, HIGH);
+    delayMicroseconds(5);
+    digitalWrite(readPin, LOW);
 }
+*/
 
