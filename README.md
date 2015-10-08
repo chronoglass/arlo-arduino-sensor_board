@@ -11,7 +11,7 @@ Serial connections:
 (if you havn't changed the transmission settings from per_robot file in .arlobot)
 arduino 0 (rx) -> Parallax activity board P6
 arduino 1 (tx) -> parallax activity board P5
-arduino Dng -> parallax activity board Gnd
+arduino Gnd -> parallax activity board Gnd
 
-if you have more than 3 sensors, you should use the 5 volt line off of the robot for power.
-Otherwise you may experience overheating on the arduino.
+it's possible that the duino can't keep up with the parallax' requests.
+though i am not looking for rate limit (yet)
