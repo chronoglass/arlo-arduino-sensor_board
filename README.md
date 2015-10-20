@@ -8,10 +8,10 @@ https://github.com/chrisl8/ArloBot/tree/master/Propeller%20C%20Code%20for%20Arlo
 Serial communication apears to be working
 have bumped communication down between the duino and propeller board to 57600
 
-Serial connections:
+Serial connections: (changed to use softwareserial library)
 (if you havn't changed the transmission settings from per_robot file in .arlobot)
-arduino 0 (rx) -> Parallax activity board P6
-arduino 1 (tx) -> parallax activity board P5
+arduino 11 (rx) -> Parallax activity board P6
+arduino 12 (tx) -> parallax activity board P5
 arduino Gnd -> parallax activity board Gnd
 
 it's possible that the duino can't keep up with the parallax' requests.

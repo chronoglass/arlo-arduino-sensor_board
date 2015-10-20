@@ -13,19 +13,20 @@
  *  by David A. Mellis
  *  modified 30 Aug 2011
  *  by Tom Igoe
-
  * This example code is in the public domain.
-
  */
+#include <SoftwareSerial.h>
 
 //first numbered pin a ping data line is plugged into
 //these need to be consecutive
 //pins 0 and 1 should be reserved for serial communication, do not use for sensors
+//converting to software serial
+SoftwareSerial mySerial(10, 11);
 const int startPingPin = 2;
 //number of ping sensors
 const int numPing = 4;
 //starting IR sensor pin (these will be labeled analog IN on the arduino, default SHOULD be A0) 
-const int numIr = 0;
+const int numIr = 4;
 
 /*debug vars
  * enable debug info to serial
@@ -39,22 +40,43 @@ char request;
 String retValFormat1 = "p,";
 String retValFormat2 = ",";
 String retValFormat3 = ".";
+String retValFormat4 = "i,";
 String retVal;
 
 void setup() {
   // initialize serial communication:
-  Serial.begin(57600);
+  Serial.begin(115200);
   //retVal = retValFormat1;
+  while(!Serial){
+    ;
+    }
+  mySerial.begin(115200);
 }
 
 void loop() {
   if(Serial.available() > 0){
+    debug = (char)Serial.read();
+    if(debug == 'h'){
+      Serial.println("no help for you!");
+      debug = 'u';
+    }
+    if(debug == 'd'){
+      pollSensors();
+      debug = 'u';
+    }
+  }
+  if(mySerial.available() > 0){
     //request = '';
-    request = (char)Serial.read();
+    request = (char)mySerial.read();
   }
   if(request == 'i'){
     pollSensors(); // poll the sensors for data and print to serial
     request = 's';
+  }
+  if(request == 'p'){
+    //setup prep stuff here so the main board can tell us
+    //how many sensors we should be polling instead of hard
+    //hard coding it
   }
 }
 
@@ -107,7 +129,7 @@ void pollSensors(){
     if(debug == 1)
       start = micros();
     retVal = retValFormat1+i+retValFormat2+pcm+retValFormat3;
-    Serial.print(retVal);
+    mySerial.print(retVal);
     if(debug == 1){
       finish = micros();
       Serial.println(" ");
@@ -116,8 +138,9 @@ void pollSensors(){
     }
     //if there is a matching IR sensor return it's reading as well
     if(i < numIr ){
-        retVal = retValFormat1+i+retValFormat2+irSenseCm(i)+retValFormat3;
-        Serial.print(retVal);
+        int convertCM = (int) irSenseCm(i);
+        retVal = retValFormat4+i+retValFormat2+convertCM+retValFormat3;
+        mySerial.print(retVal);
       }
   }
 }
