@@ -15,12 +15,20 @@
  *  by Tom Igoe
  * This example code is in the public domain.
  */
+ 
+ /*
+ TODO:
+ Need to add some sort of diagnostics, or error reporting
+ add support for more sensors
+ - xv11 lidar
+ - lidar lite sensor
+ - pir?
+ - other?
+ */
 #include <SoftwareSerial.h>
 
 //first numbered pin a ping data line is plugged into
 //these need to be consecutive
-//pins 0 and 1 should be reserved for serial communication, do not use for sensors
-//converting to software serial
 SoftwareSerial mySerial(10, 11);
 const int startPingPin = 2;
 //number of ping sensors
@@ -31,6 +39,7 @@ const int numIr = 4;
 /*debug vars
  * enable debug info to serial
  * this will mess up ROS, so do not use in "production"
+ * mostly just giving time to return sort of info
  * 0 = normal, 1 = debug mode
  */
 int debug = 0;
